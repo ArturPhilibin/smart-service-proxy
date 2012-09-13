@@ -115,13 +115,32 @@ public class SLSEBackend extends Backend {
 		 * - if GET "$base/sources/edit" return sources edit form
 		 * - if POST "$base/sources/", call setSources($postdata)
 		 */
-
-		if(uri.equals(entityManager.normalizeURI(pathPrefix + "/create-entity"))) {
+    	
+        if (uri.equals(entityManager.normalizeURI(pathPrefix + "/list-entities")))
+        {
+        	if (request.getMethod() == HttpMethod.GET)
+        	{
+        		StringBuffer sb = new StringBuffer();
+        		sb.append("<html><head><title>SLSE List</title></head><body><h1>SLSE List</h1><ol>");
+        		
+        		for (ServiceLevelSemanticEntity slse : this.slseCache.getAll())
+        		{
+        			sb.append("<li>");
+        			sb.append(slse.getURI() + "<pre>" + slse.getDescribes() + "</pre>");
+        			sb.append("</li>");
+        		}
+        		
+        		sb.append("</ol></body></html>");
+        		
+        		Channels.write(ctx.getChannel(), Answer.create(sb.toString()));
+        	}
+        }
+        else if(uri.equals(entityManager.normalizeURI(pathPrefix + "/create-entity"))) {
 			if(request.getMethod() == HttpMethod.GET) {
                 //copy into
-                HttpResponse response = new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
-                response.setContent(ChannelBuffers.wrappedBuffer(htmlContent));
-                Channels.write(ctx.getChannel(), response);
+                //HttpResponse response = new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
+                //response.setContent(ChannelBuffers.wrappedBuffer(htmlContent));
+                Channels.write(ctx.getChannel(), Answer.create(new String(htmlContent)));
 //				Channels.write(ctx.getChannel(),
 //						Answer.create(new File("data/slse/ui/create_entity_form.html")));
 			}
@@ -217,6 +236,11 @@ public class SLSEBackend extends Backend {
 
     public ElementSemanticEntityCache getElementSemanticEntityCache() {
         return eseCache;
+    }
+    
+    public ServiceLevelSemanticEntityCache getServiceLevelSemanticEntityCache()
+    {
+    	return this.slseCache;
     }
 }
 

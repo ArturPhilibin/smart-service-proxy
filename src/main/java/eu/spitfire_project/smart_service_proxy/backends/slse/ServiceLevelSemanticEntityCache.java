@@ -26,6 +26,7 @@
 package eu.spitfire_project.smart_service_proxy.backends.slse;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -70,6 +71,15 @@ public class ServiceLevelSemanticEntityCache {
 	 */
 	synchronized public ServiceLevelSemanticEntity get(String uri) {
 		return byURI.get(uri);
+	}
+	
+	/**
+	 * Returns all cached SLSEs
+	 */
+	synchronized public Collection<ServiceLevelSemanticEntity> getAll()
+	{
+		// assuming byURI and byDescribes always have the same SLSEs
+		return byURI.values();
 	}
 	
 	/**

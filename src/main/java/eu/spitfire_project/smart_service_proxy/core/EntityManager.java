@@ -25,6 +25,9 @@
 package eu.spitfire_project.smart_service_proxy.core;
 
 import eu.spitfire_project.smart_service_proxy.backends.coap.CoapBackend;
+import eu.spitfire_project.smart_service_proxy.backends.slse.SLSEBackend;
+import eu.spitfire_project.smart_service_proxy.backends.slse.ServiceLevelSemanticEntity;
+
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.Channels;
@@ -34,6 +37,8 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -271,6 +276,20 @@ public class EntityManager extends SimpleChannelHandler {
 				buf.append(String.format("<li><a href=\"%s\">%s</a></li>\n", entry.getKey(), entry.getKey()));
 			}
             buf.append("</ul>\n");
+            
+            buf.append("<h2>Service-level Entities</h2>");
+            buf.append("<ul>\n");
+            
+            SLSEBackend slseBackend = this.getSlseBackend();
+            Collection<ServiceLevelSemanticEntity> slses = (slseBackend == null) ? 
+            			new ArrayList<ServiceLevelSemanticEntity>() : 
+            			slseBackend.getServiceLevelSemanticEntityCache().getAll();
+            
+			for(ServiceLevelSemanticEntity slse : slses) {
+				buf.append(String.format("<li><a href=\"%s\">%s</a></li>\n", slse.getURI(), slse.getDescribes()));
+			}
+			
+            buf.append("</ul>\n");
 
             //Retreive resources from all registered Backends
             for(Backend backend : pathBackends.values()){
@@ -346,6 +365,23 @@ public class EntityManager extends SimpleChannelHandler {
 			b = pathBackends.get(pathPart);
 		}
 		return b;
+	}
+	
+	/**
+	 * Gets a reference to the SLSEBackend
+	 * @return An SLSEBackend instance, or null if none exist
+	 */
+	private final SLSEBackend getSlseBackend()
+	{
+		for (Backend b : this.entityBackends.values())
+		{
+			if (b instanceof SLSEBackend)
+			{
+				return (SLSEBackend)b;
+			}
+		}
+		
+		return null;
 	}
 }
 
