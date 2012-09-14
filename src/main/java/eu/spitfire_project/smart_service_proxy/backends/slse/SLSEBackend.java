@@ -238,8 +238,7 @@ public class SLSEBackend extends Backend {
         return eseCache;
     }
     
-    public ServiceLevelSemanticEntityCache getServiceLevelSemanticEntityCache()
-    {
+    public ServiceLevelSemanticEntityCache getServiceLevelSemanticEntityCache() {
     	return this.slseCache;
     }
 }
